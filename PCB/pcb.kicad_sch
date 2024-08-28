@@ -23403,7 +23403,7 @@
 				)
 			)
 		)
-		(property "Footprint" "xiao ESP32S3_PCB:MOUDLE14P-SMD-2.54-21X17.8MM"
+		(property "Footprint" "CustomFootprints:MCU_Seeed_ESP32C3_TH"
 			(at 69.85 52.07 0)
 			(effects
 				(font

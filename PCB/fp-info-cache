@@ -1,4 +1,4 @@
-23750423881925775
+23750417073021973
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -54662,20 +54662,13 @@ SMD SMT ceramic resonator filter filter hand-soldering
 0
 3
 3
-CustomLibrary
-IND_B1047AS-4R7N=P3
-
-
+CustomFootprints
+MCU_Seeed_ESP32C3_TH
+ESP32C3 Seeed Xiao RF Wifi Shield (https://www.seeedstudio.com/blog/wp-content/uploads/2022/08/Seeed-Studio-XIAO-Series-Package-and-PCB-Design.pdf)
+wifi bluetooth microcontroller
 0
-2
-2
-CustomLibrary
-RJ45_TE_CONNECTIVITY_5555164-1_Horizontal-Low_Profile
-8 Pol Shallow Latch Connector, Modjack, RJ45 (https://cdn.amphenol-icc.com/media/wysiwyg/files/drawing/c-bmj-0102.pdf)
-RJ45
-0
-8
-8
+14
+14
 Diode_SMD
 D_0201_0603Metric
 Diode SMD 0201 (0603 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: https://www.vishay.com/docs/20052/crcw0201e3.pdf), generated with kicad-footprint-generator
@@ -96655,10 +96648,17 @@ Varistor VF
 0
 2
 2
-xiao ESP32S3_PCB
-MOUDLE14P-SMD-2.54-21X17.8MM
+footprints
+MODULE_815
 
 
 0
-14
-14
+64
+64
+footprints
+MODULE_ESP32-DEVKITC
+
+
+0
+38
+38
