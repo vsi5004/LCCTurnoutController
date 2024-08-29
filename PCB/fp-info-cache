@@ -1,4 +1,4 @@
-23750417073021973
+23752148763950084
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -54669,6 +54669,20 @@ wifi bluetooth microcontroller
 0
 14
 14
+CustomLibrary
+IND_B1047AS-4R7N=P3
+
+
+0
+2
+2
+CustomLibrary
+RJ45_TE_CONNECTIVITY_5555164-1_Horizontal-Low_Profile
+8 Pol Shallow Latch Connector, Modjack, RJ45 (https://cdn.amphenol-icc.com/media/wysiwyg/files/drawing/c-bmj-0102.pdf)
+RJ45
+0
+8
+8
 Diode_SMD
 D_0201_0603Metric
 Diode SMD 0201 (0603 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: https://www.vishay.com/docs/20052/crcw0201e3.pdf), generated with kicad-footprint-generator
@@ -96648,17 +96662,10 @@ Varistor VF
 0
 2
 2
-footprints
-MODULE_815
+xiao ESP32S3_PCB
+MOUDLE14P-SMD-2.54-21X17.8MM
 
 
 0
-64
-64
-footprints
-MODULE_ESP32-DEVKITC
-
-
-0
-38
-38
+14
+14

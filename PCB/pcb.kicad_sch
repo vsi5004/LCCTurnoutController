@@ -7562,10 +7562,6 @@
 		(uuid "267cf2d3-062d-4ccb-8928-11056d11d004")
 	)
 	(no_connect
-		(at 93.98 59.69)
-		(uuid "48381d5d-8137-4098-ae3a-111eef6ba3eb")
-	)
-	(no_connect
 		(at 71.12 135.89)
 		(uuid "5426da5b-4ba5-4766-bcfb-1894b26bc9ff")
 	)
@@ -9036,6 +9032,16 @@
 			(type default)
 		)
 		(uuid "3d80c822-3f83-49f7-8e4c-e28bc110d598")
+	)
+	(wire
+		(pts
+			(xy 127 76.2) (xy 132.08 76.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3da00cf1-83f4-4dae-b2aa-456a23cc247f")
 	)
 	(wire
 		(pts
@@ -10539,6 +10545,16 @@
 	)
 	(wire
 		(pts
+			(xy 127 67.31) (xy 132.08 67.31)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8c2417b3-0c21-472b-b77c-dfb2ddf336d8")
+	)
+	(wire
+		(pts
 			(xy 384.81 214.63) (xy 384.81 213.36)
 		)
 		(stroke
@@ -11829,6 +11845,16 @@
 	)
 	(wire
 		(pts
+			(xy 121.92 67.31) (xy 120.65 67.31)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c110944f-91cb-4e51-942e-16fe8a5132b4")
+	)
+	(wire
+		(pts
 			(xy 314.96 193.04) (xy 321.31 193.04)
 		)
 		(stroke
@@ -12689,6 +12715,16 @@
 	)
 	(wire
 		(pts
+			(xy 27.94 204.47) (xy 35.56 204.47)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e5fc44ae-5c4a-4904-b228-2de495d87de5")
+	)
+	(wire
+		(pts
 			(xy 153.67 185.42) (xy 163.83 185.42)
 		)
 		(stroke
@@ -13176,6 +13212,16 @@
 			(type default)
 		)
 		(uuid "fb1e33f2-d6b9-4d48-8555-a181110eb6f1")
+	)
+	(wire
+		(pts
+			(xy 121.92 76.2) (xy 120.65 76.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "fc9cee32-cfda-45b0-a970-19d4855c4b7c")
 	)
 	(wire
 		(pts
@@ -13790,6 +13836,28 @@
 			)
 		)
 	)
+	(global_label "WIFI_LED"
+		(shape input)
+		(at 44.45 40.64 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "2306479f-06bb-42cd-9c64-8c0bf61a2856")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 33.9547 40.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
 	(global_label "CAN-L"
 		(shape bidirectional)
 		(at 247.65 19.05 0)
@@ -13858,7 +13926,7 @@
 	)
 	(global_label "CAN-TX"
 		(shape output)
-		(at 93.98 52.07 0)
+		(at 93.98 55.88 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -13868,7 +13936,7 @@
 		)
 		(uuid "34a9f933-4d9e-42c6-9665-ed6ee93c2572")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 103.7496 52.07 0)
+			(at 103.7496 55.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13880,7 +13948,7 @@
 	)
 	(global_label "GPIO_nRESET"
 		(shape input)
-		(at 35.56 204.47 180)
+		(at 27.94 204.47 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -13890,12 +13958,34 @@
 		)
 		(uuid "35e99e94-a19f-4c36-b993-a3795b7190fe")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 20.892 204.47 0)
+			(at 13.272 204.47 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify right)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "ACTIVITY_LED"
+		(shape input)
+		(at 93.98 52.07 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "39504f77-82f4-4b16-bfdc-9af2fd98e4fe")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 108.4063 52.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
 				(hide yes)
 			)
 		)
@@ -14012,7 +14102,7 @@
 	)
 	(global_label "USER_BTN"
 		(shape input)
-		(at 44.45 40.64 180)
+		(at 44.45 44.45 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -14022,7 +14112,7 @@
 		)
 		(uuid "4bbadf2a-0e23-4b0b-b430-21533e5685ff")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 32.6243 40.64 0)
+			(at 32.6243 44.45 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14056,7 +14146,7 @@
 	)
 	(global_label "CAN-RX"
 		(shape input)
-		(at 93.98 55.88 0)
+		(at 93.98 59.69 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -14066,7 +14156,7 @@
 		)
 		(uuid "4e864b4b-5ccb-45bb-8183-d282801319ed")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 104.052 55.88 0)
+			(at 104.052 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14760,7 +14850,7 @@
 	)
 	(global_label "FACTORY_RESET"
 		(shape input)
-		(at 44.45 44.45 180)
+		(at 44.45 48.26 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -14770,29 +14860,7 @@
 		)
 		(uuid "8bf92bc0-d55f-449b-85e9-ecc6e81bdd5d")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 27.3024 44.45 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "GPIO_nRESET"
-		(shape output)
-		(at 44.45 48.26 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "8e66aec0-df17-4b75-9749-cd21d716eefd")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 29.782 48.26 0)
+			(at 27.3024 48.26 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14837,6 +14905,28 @@
 		(uuid "94a10cae-6ef2-4b64-9d98-fb22aa3306cc")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 267.0904 26.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "ACTIVITY_LED"
+		(shape input)
+		(at 115.57 76.2 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "9759219f-d44b-4b6d-b921-caa54e9e475f")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 101.1437 76.2 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15607,6 +15697,28 @@
 		(uuid "f345e52a-8e0a-425a-b438-90809dd3b799")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 371.1245 72.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "WIFI_LED"
+		(shape input)
+		(at 115.57 67.31 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "f7711844-f905-4ae2-85ab-9ec73478286e")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 105.0747 67.31 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18573,7 +18685,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "MountingHole:MountingHole_2.7mm_M2.5"
+		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3_Pad"
 			(at 275.59 269.24 0)
 			(effects
 				(font
@@ -18636,7 +18748,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "MountingHole:MountingHole_2.7mm_M2.5"
+		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3_Pad"
 			(at 275.59 264.16 0)
 			(effects
 				(font
@@ -19055,7 +19167,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "MountingHole:MountingHole_2.7mm_M2.5"
+		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3_Pad"
 			(at 275.59 259.08 0)
 			(effects
 				(font
@@ -19246,7 +19358,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Button_Switch_SMD:SW_SPST_EVQPE1"
+		(property "Footprint" "Button_Switch_SMD:SW_Tactile_SPST_NO_Straight_CK_PTS636Sx25SMTRLFS"
 			(at 161.29 30.48 0)
 			(effects
 				(font
@@ -19530,7 +19642,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Button_Switch_SMD:SW_SPST_EVQPE1"
+		(property "Footprint" "Button_Switch_SMD:SW_Tactile_SPST_NO_Straight_CK_PTS636Sx25SMTRLFS"
 			(at 161.29 57.15 0)
 			(effects
 				(font
@@ -22418,6 +22530,71 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+3V3")
+		(at 132.08 76.2 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "18c8bf23-252c-4170-bbf9-f44c79ca27c4")
+		(property "Reference" "#PWR013"
+			(at 132.08 80.01 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+3V3"
+			(at 132.08 72.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 132.08 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 132.08 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 132.08 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "9a75cb2a-3a80-4f51-b948-c8ae7ef5e2a1")
+		)
+		(instances
+			(project "pcb"
+				(path "/4431c0f6-83ea-4eee-95a8-991da2f03ccd"
+					(reference "#PWR013")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Diode:1N4148W")
 		(at 300.99 170.18 0)
 		(unit 1)
@@ -22931,6 +23108,71 @@
 			(project "pcb"
 				(path "/4431c0f6-83ea-4eee-95a8-991da2f03ccd"
 					(reference "D14")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+3V3")
+		(at 132.08 67.31 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "21e6263a-de25-4bd6-b508-cd19102ce242")
+		(property "Reference" "#PWR011"
+			(at 132.08 71.12 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+3V3"
+			(at 132.08 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 132.08 67.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 132.08 67.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 132.08 67.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "f7cabcaf-3c66-4fb0-aab6-4d7f6c7f7b66")
+		)
+		(instances
+			(project "pcb"
+				(path "/4431c0f6-83ea-4eee-95a8-991da2f03ccd"
+					(reference "#PWR011")
 					(unit 1)
 				)
 			)
@@ -27290,6 +27532,158 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:LED_Small")
+		(at 124.46 76.2 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "5fd0ecd1-c575-4679-8eea-cf9abb4ab192")
+		(property "Reference" "D2"
+			(at 124.46 70.231 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "Activity"
+			(at 124.46 72.5424 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "LED_SMD:LED_0603_1608Metric"
+			(at 124.46 76.2 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 124.46 76.2 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 124.46 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mouser" "710-150060AS75000"
+			(at 124.46 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "77694239-1609-4a04-8454-dc0595508d02")
+		)
+		(pin "2"
+			(uuid "27ec9448-8ffc-4b38-b40c-12bd43076b65")
+		)
+		(instances
+			(project "pcb"
+				(path "/4431c0f6-83ea-4eee-95a8-991da2f03ccd"
+					(reference "D2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:LED_Small")
+		(at 124.46 67.31 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "60716cf9-28d5-47d4-bddb-9c6f21875c12")
+		(property "Reference" "D1"
+			(at 124.46 61.341 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "WiFi"
+			(at 124.46 63.6524 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "LED_SMD:LED_0603_1608Metric"
+			(at 124.46 67.31 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 124.46 67.31 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 124.46 67.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mouser" "710-150060VS55040"
+			(at 124.46 67.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "a0a31cac-4795-43a5-ac80-94ebcc2b409c")
+		)
+		(pin "2"
+			(uuid "d2b91523-cc8e-4ee5-9b18-8e73f391047e")
+		)
+		(instances
+			(project "pcb"
+				(path "/4431c0f6-83ea-4eee-95a8-991da2f03ccd"
+					(reference "D1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Transistor_BJT:MMBT2222A")
 		(at 314.96 215.9 90)
 		(unit 1)
@@ -31264,6 +31658,82 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:R_Small")
+		(at 118.11 76.2 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "a084d510-6fbe-4aa0-b571-f08fe8f3c65a")
+		(property "Reference" "R11"
+			(at 118.11 71.2216 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "220R"
+			(at 118.11 73.533 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 118.11 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 118.11 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 118.11 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mouser" "603-AC0603JR-07160RL"
+			(at 118.11 76.2 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "bf30c715-0047-4f89-8acb-6546a2312e8c")
+		)
+		(pin "2"
+			(uuid "9f0b893b-1585-47ae-ba5d-711c52b77c2d")
+		)
+		(instances
+			(project "pcb"
+				(path "/4431c0f6-83ea-4eee-95a8-991da2f03ccd"
+					(reference "R11")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:GND")
 		(at 20.32 175.26 0)
 		(unit 1)
@@ -32646,6 +33116,82 @@
 			(project "pcb"
 				(path "/4431c0f6-83ea-4eee-95a8-991da2f03ccd"
 					(reference "D36")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R_Small")
+		(at 118.11 67.31 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "b165af2a-4fd6-4255-a45c-72d64b508f9f")
+		(property "Reference" "R10"
+			(at 118.11 62.3316 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "220R"
+			(at 118.11 64.643 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 118.11 67.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 118.11 67.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 118.11 67.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mouser" "603-AC0603JR-07160RL"
+			(at 118.11 67.31 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "881fad6d-d23c-421a-8852-7c6662762851")
+		)
+		(pin "2"
+			(uuid "538aa6f2-370c-4cb7-9b2a-6fc8ac6a3aef")
+		)
+		(instances
+			(project "pcb"
+				(path "/4431c0f6-83ea-4eee-95a8-991da2f03ccd"
+					(reference "R10")
 					(unit 1)
 				)
 			)
@@ -34473,7 +35019,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "MountingHole:MountingHole_2.7mm_M2.5"
+		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3_Pad"
 			(at 275.59 274.32 0)
 			(effects
 				(font
