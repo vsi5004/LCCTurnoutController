@@ -66,7 +66,17 @@ You can find the fusion 360 archive and step files for a 3d-printable stand-off 
 
 ![PCB Mount Render](Doc/mount_render.png)
 
-# Acknowledgements
+## JMRI Configuration
+
+The Turnout Controller must be plugged into an active LCC bus in order to be configured. I have successfully tested the boards with a TCS CS-105 base station, connected to a Raspberry Pi 5. The Pi had JMRI installed and was connected to the CS-105 via a shared WiFi network.
+
+Upon plugging in the Turnout Controller, I was able to see the entry for that device's address pop up:
+![JMRI Discovery](Doc/jmri_discovery.png)
+
+Clicking on the Board in the OpenLCB Network list expanded the entry to show a "Open Configuration Dialog" option. Clicking that opened a separate window where I was able to adjust the name and description of the Turnout Controller, along with the different servo and frog attributes of the 8 turnouts controlled by the board:
+![JMRI Configuration](Doc/jmri_config.png)
+
+## Acknowledgements
 
 This project borrows heavily from Mike Dunston's ESP32 OpenLCB IO Board for the PCB design:
 https://github.com/atanisoft/Esp32OlcbIO
