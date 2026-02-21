@@ -43,7 +43,7 @@ extern const char *const SNIP_DYNAMIC_FILENAME = CONFIG_FILENAME;
 // ── Global hardware objects (declared extern in HardwareDefs.h) ─────
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 Adafruit_MCP23X17       mcp;
-Esp32Can                can0((gpio_num_t)D8, (gpio_num_t)D9);
+Esp32Can                can0(GPIO_NUM_8, GPIO_NUM_7);  // TX=GPIO8(D9/PA5), RX=GPIO7(D8/PA7)
 OpenMRN                 openmrn(NODE_ID);
 Preferences             turnoutPrefs;
 
@@ -68,6 +68,7 @@ static void setup_frog_gpio() {
 // ═══════════════════════════════════════════════════════════════════
 void setup() {
     Serial.begin(115200);
+    delay(2000);
 
     // Init LED early so the factory-reset flash sequence can use it.
     pinMode(LED_BUILTIN, ARDUINO_OUTPUT);
@@ -111,16 +112,17 @@ void setup() {
             openmrn.stack()->node(),
             cfg.seg().turnouts().entry(i),
             PWM_COUNT_PER_MS, servoPwmWrappers[i], gpioWrappers[i]);
+        // Note: ServoTurnout auto-registers with ConfigUpdateService in constructor
     }
 
     // ── NVS persistence & state restore ─────────────────────────────
     restore_turnout_states(needsFactoryReset);
 
     // ── Start OpenMRN / CAN ─────────────────────────────────────────
-    openmrn.begin();
-    openmrn.start_executor_thread();
     can0.begin();
     openmrn.add_can_port(&can0);
+    openmrn.begin();
+    openmrn.start_executor_thread();
 
     Serial.println("=== Initialization Complete ===\n");
 }

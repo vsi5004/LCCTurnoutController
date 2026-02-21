@@ -70,6 +70,8 @@ public:
      */
     void set_state(bool new_value) OVERRIDE
     {
+        if (currentState_ == new_value)
+            return;
         currentState_ = new_value;
         if (new_value)
         {

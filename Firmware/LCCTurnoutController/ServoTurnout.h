@@ -72,10 +72,10 @@ public:
         }
 
         if (frogModified ||
-            cfg_event_min != gpioImpl_.event_off() ||
-            cfg_event_max != gpioImpl_.event_on() ||
-            cfg_srv_ticks_min != gpioImpl_.pwm_min_ticks_ ||
-            cfg_srv_ticks_max != gpioImpl_.pwm_max_ticks_)
+            cfg_event_min != gpioImpl_.event_on() ||
+            cfg_event_max != gpioImpl_.event_off() ||
+            cfg_srv_ticks_min != gpioImpl_.pwm_max_ticks_ ||
+            cfg_srv_ticks_max != gpioImpl_.pwm_min_ticks_)
         {
             auto saved_node = gpioImpl_.node();
             auto saved_gpio = gpioImpl_.gpio_;
