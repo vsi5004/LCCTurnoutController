@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <Adafruit_PWMServoDriver.h>
-#include "freertos_drivers/arduino/PWM.hxx"
+#include "freertos_drivers/common/PWM.hxx"
 
 /**
  * @brief PCA9685Pwm provides a PWM interface for the Adafruit PCA9685 servo driver.

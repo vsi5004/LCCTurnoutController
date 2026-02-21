@@ -24,7 +24,7 @@ namespace openlcb
 /// - the generated cdi.xml will include this data
 /// - the Simple Node Ident Info Protocol will return this data
 /// - the ACDI memory space will contain this data.
-extern const SimpleNodeStaticValues SNIP_STATIC_DATA = {
+inline const SimpleNodeStaticValues SNIP_STATIC_DATA = {
     4,
     "OpenMRN",
     "LCC Turnout Controller",

@@ -1,16 +1,12 @@
 #ifndef __SERVOTURNOUT_HXX
 #define __SERVOTURNOUT_HXX
 
-#if defined(ARDUINO) || defined(ESP32)
-#include "freertos_drivers/arduino/DummyGPIO.hxx"
-#include "freertos_drivers/arduino/PWM.hxx"
-#else
 #include "freertos_drivers/common/DummyGPIO.hxx"
 #include "freertos_drivers/common/PWM.hxx"
-#endif
 #include "os/MmapGpio.hxx"
 #include "TurnoutConfig.h"
 #include "ServoGPIOBit.h"
+#include "MCPGpio.h"
 #include <memory>
 
 namespace openlcb
@@ -24,9 +20,13 @@ public:
         : DefaultConfigUpdateListener()
         , pwmCountPerMs_(pwmCountPerMs)
         , gpioImpl_(node, 0, 0, gpio, pwm, 0, 0)
-        , consumer_(&gpioImpl_)
+        , pc_(&gpioImpl_)
         , cfg_(cfg)
         , frogInverted_(0xFF)
+        , savedCallback_()
+        , savedIndex_(0)
+        , hasPendingRestore_(false)
+        , pendingRestoreState_(false)
     {
     }
 
@@ -81,12 +81,27 @@ public:
             auto saved_gpio = gpioImpl_.gpio_;
             auto saved_pwm = gpioImpl_.pwm_;
 
-            consumer_.~BitEventConsumer();
+            pc_.~BitEventPC();
             gpioImpl_.~ServoGPIOBit();
 
             new (&gpioImpl_) ServoGPIOBit(
                 saved_node, cfg_event_min, cfg_event_max, saved_gpio, saved_pwm, cfg_srv_ticks_max, cfg_srv_ticks_min );
-            new (&consumer_) BitEventConsumer(&gpioImpl_);
+            // Re-attach the state callback lost during placement new.
+            if (savedCallback_)
+            {
+                gpioImpl_.set_state_callback(savedIndex_, savedCallback_);
+            }
+            new (&pc_) BitEventPC(&gpioImpl_);
+
+            // On first boot, restore the persisted state now that the real
+            // servo tick values have been applied.
+            if (initial_load && hasPendingRestore_)
+            {
+                hasPendingRestore_ = false;
+                gpioImpl_.restore_state(pendingRestoreState_);
+                Serial.printf("ServoTurnout: applied pending restore (%s)\n",
+                              pendingRestoreState_ ? "NORMAL" : "REVERSED");
+            }
 
             return REINIT_NEEDED;
         }
@@ -101,14 +116,39 @@ public:
         CDI_FACTORY_RESET(cfg_.frog_inverted);
     }
 
+    /// Provide access to the underlying ServoGPIOBit for state
+    /// restoration at startup.
+    ServoGPIOBit &gpio_impl() { return gpioImpl_; }
+
+    /// Queue a state restore to be applied in apply_configuration()
+    /// once the real servo tick values are known.
+    void set_pending_restore(bool state)
+    {
+        hasPendingRestore_ = true;
+        pendingRestoreState_ = state;
+    }
+
+    /// Set the persistence callback.  Also remembers it so it can be
+    /// re-attached after apply_configuration() reconstructs gpioImpl_.
+    void set_state_callback(uint8_t index, TurnoutStateCallback cb)
+    {
+        savedIndex_ = index;
+        savedCallback_ = cb;
+        gpioImpl_.set_state_callback(index, std::move(cb));
+    }
+
 private:
     /// Used to compute PWM ticks for max/min servo rotation.
     const uint32_t pwmCountPerMs_;
     /// all the rest are owned and must be reset on config change.
-    ServoGPIOBit gpioImpl_;          /// has on/off events, Node*, and Gpio*
-    BitEventConsumer consumer_; /// has GPIOBit*
+    ServoGPIOBit gpioImpl_;    /// has on/off events, Node*, and Gpio*
+    BitEventPC pc_;            /// producer-consumer for state events
     const TurnoutConfig cfg_;
     uint8_t frogInverted_;
+    TurnoutStateCallback savedCallback_; /// callback preserved across reconfig
+    uint8_t savedIndex_;                 /// turnout index preserved across reconfig
+    bool hasPendingRestore_;   /// true if a restore is queued for initial load
+    bool pendingRestoreState_; /// the state to restore
 };
 
 } // namespace openlcb

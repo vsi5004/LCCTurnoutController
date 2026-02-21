@@ -2,10 +2,15 @@
 #define __SERVO_GPIO_BIT_HXX
 
 #include "os/Gpio.hxx"
-#include "freertos_drivers/arduino/PWM.hxx"
+#include "freertos_drivers/common/PWM.hxx"
+#include <functional>
 
 namespace openlcb
 {
+
+/// Callback type invoked after a turnout state change.
+/// Parameters: turnout index, new state (true = normal, false = reversed).
+using TurnoutStateCallback = std::function<void(uint8_t, bool)>;
 
 /**
  * @brief An extended version of GPIOBit that also controls a servo.
@@ -13,6 +18,9 @@ namespace openlcb
  * This class handles both:
  * - The frog relay (via GPIO)
  * - The turnout servo position (via PWM)
+ *
+ * State is tracked internally (not read from GPIO) because MCPGpio uses
+ * pulsed outputs that auto-deactivate after 300ms.
  */
 class ServoGPIOBit : public BitEventInterface
 {
@@ -35,7 +43,8 @@ public:
           gpio_(gpio),
           pwm_(pwm),
           pwm_min_ticks_(pwm_min_ticks),
-          pwm_max_ticks_(pwm_max_ticks)
+          pwm_max_ticks_(pwm_max_ticks),
+          currentState_(false)
     {
         Serial.println("ServoGPIOBit: Initialized");
     }
@@ -43,12 +52,15 @@ public:
     /**
      * @brief Get the current event state (whether the turnout is set).
      *
+     * Uses an internal boolean rather than reading GPIO, because MCPGpio
+     * pulses its outputs and auto-deactivates after 300ms.
+     *
      * @return EventState::VALID if the turnout is in the normal position,
      *         EventState::INVALID if in the reversed position.
      */
     EventState get_current_state() OVERRIDE
     {
-        return gpio_->is_set() ? EventState::VALID : EventState::INVALID;
+        return currentState_ ? EventState::VALID : EventState::INVALID;
     }
 
     /**
@@ -58,6 +70,7 @@ public:
      */
     void set_state(bool new_value) OVERRIDE
     {
+        currentState_ = new_value;
         if (new_value)
         {
             gpio_->write(Gpio::SET);
@@ -69,6 +82,44 @@ public:
             gpio_->write(Gpio::CLR);
             pwm_->set_duty(pwm_min_ticks_);
             Serial.println("ServoGPIOBit: Turnout moved to REVERSED position");
+        }
+        if (stateCallback_)
+        {
+            stateCallback_(turnoutIndex_, currentState_);
+        }
+    }
+
+    /**
+     * @brief Set the callback invoked on every state change.
+     * @param index Turnout index (0–7) passed to the callback.
+     * @param cb    Callback function.
+     */
+    void set_state_callback(uint8_t index, TurnoutStateCallback cb)
+    {
+        turnoutIndex_ = index;
+        stateCallback_ = std::move(cb);
+    }
+
+    /**
+     * @brief Restore state from persisted storage without firing the callback.
+     *
+     * Actuates the servo and frog relay but does NOT invoke the persistence
+     * callback (to avoid writing back the value we just read).
+     */
+    void restore_state(bool state)
+    {
+        currentState_ = state;
+        if (state)
+        {
+            gpio_->write(Gpio::SET);
+            pwm_->set_duty(pwm_max_ticks_);
+            Serial.println("ServoGPIOBit: Restored to NORMAL position");
+        }
+        else
+        {
+            gpio_->write(Gpio::CLR);
+            pwm_->set_duty(pwm_min_ticks_);
+            Serial.println("ServoGPIOBit: Restored to REVERSED position");
         }
     }
 
@@ -86,6 +137,11 @@ public:
     PWM *pwm_;   ///< Servo PWM control
     uint32_t pwm_min_ticks_; ///< PWM value for the normal position
     uint32_t pwm_max_ticks_; ///< PWM value for the reversed position
+
+private:
+    bool currentState_;          ///< Internally-tracked turnout position
+    uint8_t turnoutIndex_{0};    ///< Index passed to the state callback
+    TurnoutStateCallback stateCallback_; ///< Optional persistence callback
 };
 
 } // namespace openlcb
