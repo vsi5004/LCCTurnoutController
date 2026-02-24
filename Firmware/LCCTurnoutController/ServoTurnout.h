@@ -7,6 +7,7 @@
 #include "TurnoutConfig.h"
 #include "ServoGPIOBit.h"
 #include "MCPGpio.h"
+#include <Ticker.h>
 #include <memory>
 
 namespace openlcb
@@ -16,7 +17,8 @@ class ServoTurnout : public DefaultConfigUpdateListener
 {
 public:
     ServoTurnout(Node *node, const TurnoutConfig &cfg,
-        const uint32_t pwmCountPerMs, PWM *pwm, Gpio *gpio)
+        const uint32_t pwmCountPerMs, PWM *pwm, Gpio *gpio,
+        uint8_t turnoutIndex, uint16_t staggerDelayMs)
         : DefaultConfigUpdateListener()
         , pwmCountPerMs_(pwmCountPerMs)
         , gpioImpl_(node, 0, 0, gpio, pwm, 0, 0)
@@ -27,6 +29,8 @@ public:
         , savedIndex_(0)
         , hasPendingRestore_(false)
         , pendingRestoreState_(false)
+        , turnoutIndex_(turnoutIndex)
+        , staggerDelayMs_(staggerDelayMs)
     {
     }
 
@@ -98,9 +102,24 @@ public:
             if (initial_load && hasPendingRestore_)
             {
                 hasPendingRestore_ = false;
-                gpioImpl_.restore_state(pendingRestoreState_);
-                Serial.printf("ServoTurnout: applied pending restore (%s)\n",
-                              pendingRestoreState_ ? "NORMAL" : "REVERSED");
+                // Calculate stagger delay: turnout index * configured delay
+                uint32_t delayMs = turnoutIndex_ * staggerDelayMs_;
+                if (delayMs > 0)
+                {
+                    // Schedule delayed restoration to stagger power draw
+                    restoreTicker_.once_ms(delayMs, static_restore_callback, (void*)this);
+                    Serial.printf("ServoTurnout %d: scheduled restore in %dms (%s)\n",
+                                  turnoutIndex_, delayMs,
+                                  pendingRestoreState_ ? "NORMAL" : "REVERSED");
+                }
+                else
+                {
+                    // No delay, restore immediately
+                    gpioImpl_.restore_state(pendingRestoreState_);
+                    Serial.printf("ServoTurnout %d: applied pending restore (%s)\n",
+                                  turnoutIndex_,
+                                  pendingRestoreState_ ? "NORMAL" : "REVERSED");
+                }
             }
 
             return REINIT_NEEDED;
@@ -149,6 +168,18 @@ private:
     uint8_t savedIndex_;                 /// turnout index preserved across reconfig
     bool hasPendingRestore_;   /// true if a restore is queued for initial load
     bool pendingRestoreState_; /// the state to restore
+    uint8_t turnoutIndex_;     /// index of this turnout (0-7)
+    uint16_t staggerDelayMs_;  /// milliseconds delay per turnout for staggered init
+    mutable Ticker restoreTicker_; /// timer for delayed state restoration
+
+    /// Static callback for the restore Ticker.
+    static void static_restore_callback(void* arg) {
+        ServoTurnout* self = static_cast<ServoTurnout*>(arg);
+        self->gpioImpl_.restore_state(self->pendingRestoreState_);
+        Serial.printf("ServoTurnout %d: completed delayed restore (%s)\n",
+                      self->turnoutIndex_,
+                      self->pendingRestoreState_ ? "NORMAL" : "REVERSED");
+    }
 };
 
 } // namespace openlcb

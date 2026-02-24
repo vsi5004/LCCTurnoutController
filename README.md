@@ -30,6 +30,8 @@ The board is built around a **Seeed XIAO ESP32** module and communicates on the 
 
 - **LCC bus power draw:** ~100 mA at 15 VDC on PWR_POS (increases at lower voltages).
 - **External supply:** 12 VDC, 500 mA minimum recommended.
+- **Servo power:** Servos draw significant current during movement. To prevent brownout during startup, the firmware staggers servo initialization with a configurable delay (default 300ms between servos). Some analog servos activate immediately when 5V is applied regardless of PWM signal state — a large capacitor bank (1000-2200µF per 2-3 servos) on the servo power rail or a higher-capacity power supply may be needed.
+- **PCA9685 Output Enable:** The nPWMENABLE pin (connected to ESP32 D3) disables all PWM outputs during initialization.
 - **Brownout:** If the ESP32 detects a brownout it will attempt to produce the well-known event `01.00.00.00.00.00.FF.F1` after startup (delivery not guaranteed).
 - **Factory reset:** Hold the button on **D2** while powering on for 5 seconds. The built-in LED flashes 5 times to confirm, then all configuration (CDI and saved turnout positions) is erased and the board reboots with defaults. See the [Firmware README](Firmware/README.md#factory-reset) for details.
 
@@ -63,7 +65,7 @@ Once plugged in, the node appears in JMRI's OpenLCB network list:
 
 ![JMRI Discovery](Doc/jmri_discovery.png)
 
-Opening the configuration dialog exposes per-turnout settings — name, servo endpoints, frog inversion, and the LCC event IDs used to command (and report) each turnout's position:
+Opening the configuration dialog exposes per-turnout settings — name, servo endpoints, frog inversion, and the LCC event IDs used to command (and report) each turnout's position. Global settings include the servo stagger delay for startup power management:
 
 ![JMRI Configuration](Doc/jmri_config.png)
 

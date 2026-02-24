@@ -39,6 +39,10 @@ constexpr uint8_t TURNOUT_FROG_PINS[NUM_TURNOUTS][2] = {
 static constexpr uint8_t  FACTORY_RESET_PIN     = D2;
 static constexpr uint16_t FACTORY_RESET_HOLD_MS = 5000;
 
+// ── PCA9685 output enable control ───────────────────────────────────
+// nPWMENABLE: Active-low enable (HIGH = outputs disabled, LOW = outputs enabled)
+static constexpr uint8_t  PCA9685_nOE_PIN       = D3;
+
 // ── Shared peripheral instances (defined in the .ino) ───────────────
 class PCAPwm;
 class MCPGpio;

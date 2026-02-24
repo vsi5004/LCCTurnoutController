@@ -68,11 +68,16 @@ static void setup_frog_gpio() {
 // ═══════════════════════════════════════════════════════════════════
 void setup() {
     Serial.begin(115200);
-    delay(2000);
 
     // Init LED early so the factory-reset flash sequence can use it.
     pinMode(LED_BUILTIN, ARDUINO_OUTPUT);
     digitalWrite(LED_BUILTIN, ARDUINO_LOW);
+
+    // ── Disable PWM outputs immediately to prevent servo brownout ───
+    // Pull nPWMENABLE HIGH to disable PCA9685 outputs during init
+    pinMode(PCA9685_nOE_PIN, ARDUINO_OUTPUT);
+    digitalWrite(PCA9685_nOE_PIN, ARDUINO_HIGH);
+    Serial.println("PWM outputs disabled via nOE pin");
 
     Serial.println("\n\n=== LCC Turnout Controller ===");
     Serial.printf("Node ID: 0x%012llX\n", NODE_ID);
@@ -100,10 +105,31 @@ void setup() {
     // ── Peripherals ─────────────────────────────────────────────────
     setup_frog_gpio();
     pwm.begin();
+    
+    // Clear all PWM channel registers before enabling outputs
+    for (uint8_t i = 0; i < 16; i++) {
+        pwm.setPWM(i, 0, 0);  // Set all channels to off
+    }
+    
     pwm.setOscillatorFrequency(27000000);
     pwm.setPWMFreq(SERVO_FREQ);
+    
+    // Now it's safe to enable PWM outputs - channels are all cleared
+    digitalWrite(PCA9685_nOE_PIN, ARDUINO_LOW);
+    Serial.println("PWM outputs enabled (all channels initialized to off)");
 
-    // ── Create turnout objects ──────────────────────────────────────
+    // ── Read global configuration ───────────────────────────────
+    uint16_t staggerDelayMs = 300; // default if config can't be read
+    int fd = ::open(openlcb::CONFIG_FILENAME, O_RDONLY);
+    if (fd >= 0) {
+        staggerDelayMs = cfg.seg().global().servo_stagger_delay_ms().read(fd);
+        ::close(fd);
+        Serial.printf("Servo stagger delay: %dms\n", staggerDelayMs);
+    } else {
+        Serial.println("Could not read config, using default stagger delay");
+    }
+
+    // ── Create turnout objects ──────────────────────────────────
     for (uint8_t i = 0; i < NUM_TURNOUTS; i++) {
         gpioWrappers[i]    = new MCPGpio(&mcp, TURNOUT_FROG_PINS[i][0],
                                          TURNOUT_FROG_PINS[i][1], false);
@@ -111,7 +137,8 @@ void setup() {
         servoTurnouts[i]    = new openlcb::ServoTurnout(
             openmrn.stack()->node(),
             cfg.seg().turnouts().entry(i),
-            PWM_COUNT_PER_MS, servoPwmWrappers[i], gpioWrappers[i]);
+            PWM_COUNT_PER_MS, servoPwmWrappers[i], gpioWrappers[i],
+            i, staggerDelayMs);
         // Note: ServoTurnout auto-registers with ConfigUpdateService in constructor
     }
 

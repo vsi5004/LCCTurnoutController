@@ -29,7 +29,7 @@ On first boot the firmware will format SPIFFS (if needed) and generate a CDI con
 | `TurnoutPersistence.h` / `.cpp` | NVS save / restore of turnout positions, config-version mismatch detection |
 | `config.h` | CDI layout, SNIP identification, `CANONICAL_VERSION` |
 | `TurnoutConfig.h` | Per-turnout CDI group (event IDs, servo endpoints, frog inversion) |
-| `ServoTurnout.h` | `ServoTurnout` class — ties a `ServoGPIOBit` + `BitEventPC` to the CDI config, handles live reconfiguration |
+| `ServoTurnout.h` | `ServoTurnout` class — ties a `ServoGPIOBit` + `BitEventPC` to the CDI config, handles live reconfiguration and staggered initialization |
 | `ServoGPIOBit.h` | `ServoGPIOBit` — `BitEventInterface` implementation that drives one servo + frog relay pair |
 | `MCPGpio.h` | `MCPGpio` — `Gpio` adapter for the MCP23017, drives pulsed frog-polarity relay pairs |
 | `PCAPwm.h` | `PCAPwm` — `PWM` adapter for the PCA9685, with auto-disable after 1 s |
@@ -77,8 +77,15 @@ The same event IDs serve as both **command** (consumer) and **state** (producer)
 On boot the node does **not** proactively produce `EventReport` messages. Instead:
 
 1. Persisted turnout positions are read from NVS and queued as "pending restores."
-2. When `apply_configuration()` runs for the initial load (triggered by `openmrn.begin()`), it computes the real servo tick values from the CDI config and *then* physically restores each turnout to its saved position.
-3. Once the OpenMRN stack is running, the node responds correctly to **Identify Events** queries (which most LCC nodes and JMRI send on their own startup).
+2. The PCA9685 PWM outputs are disabled via the nPWMENABLE pin (D3, active-low) to prevent servo activation during initialization.
+3. When `apply_configuration()` runs for the initial load (triggered by `openmrn.begin()`), it computes the real servo tick values from the CDI config.
+4. For each turnout with a pending restore:
+   - A staggered delay is calculated: `turnoutIndex × servo_stagger_delay_ms` (e.g., turnout 0 = 0ms, turnout 1 = 300ms, turnout 2 = 600ms, etc.)
+   - An ESP32 `Ticker` timer schedules the actual servo movement after the calculated delay
+   - This prevents all servos from moving simultaneously, which can cause brownout conditions
+5. Once the OpenMRN stack is running, the node responds correctly to **Identify Events** queries (which most LCC nodes and JMRI send on their own startup).
+
+The staggered initialization only applies during the initial configuration load. Runtime LCC commands move turnouts immediately for responsive operation.
 
 This means a control panel or touchscreen that sends Identify Events Global will immediately learn each turnout's current position.
 
@@ -108,7 +115,15 @@ If the button is released before 5 seconds, the reset is cancelled and normal bo
 
 When the firmware is updated and `CANONICAL_VERSION` in `config.h` has been incremented, the node detects that the stored config version doesn't match and treats it as a factory reset. The CDI config file is recreated by the OpenMRN stack and the NVS turnout positions are cleared, since the old saved state may not be compatible with the new configuration layout.
 
-## CDI Configuration Fields (per turnout)
+## CDI Configuration Fields
+
+### Global Settings
+
+| Field | Type | Default | Range | Description |
+|-------|------|---------|-------|-------------|
+| Servo Stagger Delay | `Uint16ConfigEntry` | `300` | 0-1000 ms | Delay in milliseconds between initializing each servo during startup. Prevents current spikes when multiple servos move simultaneously. Set to 0 to disable staggering. |
+
+### Per-Turnout Settings
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -127,6 +142,12 @@ When the firmware is updated and `CANONICAL_VERSION` in `config.h` has been incr
 | Model | LCC Turnout Controller |
 | Hardware version | *(board variant macro)* |
 | Software version | 1.0.1 |
+
+## Configuration Versioning
+
+The firmware uses `CANONICAL_VERSION` in `config.h` to track configuration structure changes.
+
+When upgrading firmware with a version change, the node performs a factory reset to ensure configuration compatibility. User data (turnout event IDs, servo endpoints, etc.) is not preserved during version transitions.
 
 ## License
 

@@ -43,13 +43,23 @@ using TurnoutGroup = RepeatedGroup<TurnoutConfig, NUM_TURNOUTS>;
 
 /// Modify this value every time the EEPROM needs to be cleared on the node
 /// after an update.
-static constexpr uint16_t CANONICAL_VERSION = 0x100;
+static constexpr uint16_t CANONICAL_VERSION = 0x101;
+
+/// Defines a global configuration group for device-level settings.
+CDI_GROUP(GlobalConfig);
+CDI_GROUP_ENTRY(servo_stagger_delay_ms, Uint16ConfigEntry, 
+    Default(300), Min(0), Max(1000),
+    Name("Servo Stagger Delay"), 
+    Description("Delay in milliseconds between initializing each servo during startup (0-1000ms). "
+                "Helps prevent current spikes when multiple servos move simultaneously."));
+CDI_GROUP_END();
 
 /// Defines the main segment in the configuration CDI. This is laid out at
 /// origin 128 to give space for the ACDI user data at the beginning.
 CDI_GROUP(IoBoardSegment, Segment(MemoryConfigDefs::SPACE_CONFIG), Offset(128));
 /// Each entry declares the name of the current entry, then the type and then
 /// optional arguments list.
+CDI_GROUP_ENTRY(global, GlobalConfig, Name("Global Settings"));
 CDI_GROUP_ENTRY(turnouts, TurnoutGroup, Name("Turnouts"), RepName("Turnout"));
 //CDI_GROUP_ENTRY(points, PointsGroup, Name("Points"), RepName("Points"));
 CDI_GROUP_ENTRY(internal_config, InternalConfigData);
