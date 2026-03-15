@@ -29,7 +29,7 @@ inline const SimpleNodeStaticValues SNIP_STATIC_DATA = {
     "OpenMRN",
     "LCC Turnout Controller",
     ARDUINO_VARIANT,
-    "1.0.1"};
+    "1.1.0"};
 
 constexpr uint8_t NUM_TURNOUTS = 8;
 //constexpr uint8_t NUM_POINTSS = 8;
