@@ -51,6 +51,29 @@ PCAPwm              *servoPwmWrappers[NUM_TURNOUTS];
 MCPGpio             *gpioWrappers[NUM_TURNOUTS];
 openlcb::ServoTurnout *servoTurnouts[NUM_TURNOUTS];
 
+// ── Debug: config space write logger ────────────────────────────────
+// Wraps the real config FileMemorySpace to log every CDI write that
+// arrives over LCC.  Lets us see whether JMRI is writing config at all
+// and whether UPDATE_COMPLETE (which triggers apply_configuration) follows.
+class LoggingConfigSpace : public MemorySpace {
+public:
+    LoggingConfigSpace(MemorySpace *delegate) : delegate_(delegate) {}
+    bool read_only() override { return delegate_->read_only(); }
+    address_t max_address() override { return delegate_->max_address(); }
+    size_t read(address_t src, uint8_t *dst, size_t len,
+               errorcode_t *err, Notifiable *again) override {
+        return delegate_->read(src, dst, len, err, again);
+    }
+    size_t write(address_t dest, const uint8_t *data, size_t len,
+                 errorcode_t *err, Notifiable *again) override {
+        Serial.printf("DEBUG ConfigSpace WRITE: offset=%u len=%u\n",
+                      (unsigned)dest, (unsigned)len);
+        return delegate_->write(dest, data, len, err, again);
+    }
+private:
+    MemorySpace *delegate_;
+};
+
 // ── MCP23017 frog-relay init ────────────────────────────────────────
 static void setup_frog_gpio() {
     if (!mcp.begin_I2C()) {
@@ -149,6 +172,25 @@ void setup() {
     can0.begin();
     openmrn.add_can_port(&can0);
     openmrn.begin();
+
+    // ── Install config-write logger ─────────────────────────────────
+    // After begin(), the stack has registered a FileMemorySpace for
+    // SPACE_CONFIG. Swap it with our logging wrapper so we can see
+    // every CDI write that arrives from JMRI.
+    {
+        auto *reg = openmrn.stack()->memory_config_handler()->registry();
+        auto *node = openmrn.stack()->node();
+        auto *origSpace = reg->lookup(node, openlcb::MemoryConfigDefs::SPACE_CONFIG);
+        if (origSpace) {
+            auto *logged = new LoggingConfigSpace(origSpace);
+            reg->erase(node, openlcb::MemoryConfigDefs::SPACE_CONFIG, origSpace);
+            reg->insert(node, openlcb::MemoryConfigDefs::SPACE_CONFIG, logged);
+            Serial.println("Config space write logging installed");
+        } else {
+            Serial.println("WARNING: could not find SPACE_CONFIG to wrap");
+        }
+    }
+
     openmrn.start_executor_thread();
 
     Serial.println("=== Initialization Complete ===\n");
