@@ -38,6 +38,8 @@ public:
         int fd, bool initial_load, BarrierNotifiable *done) OVERRIDE
     {
         AutoNotify n(done);
+        Serial.printf("ServoTurnout %d: apply_configuration called (initial_load=%s)\n",
+                      turnoutIndex_, initial_load ? "true" : "false");
 
         const EventId cfg_event_min = cfg_.event_rotate_min().read(fd);
         const EventId cfg_event_max = cfg_.event_rotate_max().read(fd);
@@ -84,6 +86,8 @@ public:
             auto saved_node = gpioImpl_.node();
             auto saved_gpio = gpioImpl_.gpio_;
             auto saved_pwm = gpioImpl_.pwm_;
+            const bool saved_state =
+                gpioImpl_.get_current_state() == EventState::VALID;
 
             pc_.~BitEventPC();
             gpioImpl_.~ServoGPIOBit();
@@ -97,10 +101,10 @@ public:
             }
             new (&pc_) BitEventPC(&gpioImpl_);
 
-            // On first boot, restore the persisted state now that the real
-            // servo tick values have been applied.
             if (initial_load && hasPendingRestore_)
             {
+                // On first boot, restore the persisted state now that the
+                // real servo tick values have been applied.
                 hasPendingRestore_ = false;
                 // Calculate stagger delay: turnout index * configured delay
                 uint32_t delayMs = turnoutIndex_ * staggerDelayMs_;
@@ -120,6 +124,16 @@ public:
                                   turnoutIndex_,
                                   pendingRestoreState_ ? "NORMAL" : "REVERSED");
                 }
+            }
+            else if (!initial_load)
+            {
+                // Live config change: re-apply the current state with the
+                // new endpoint / frog-inversion values so the servo moves
+                // to the correct position immediately.
+                gpioImpl_.restore_state(saved_state);
+                Serial.printf("ServoTurnout %d: live config update applied (%s)\n",
+                              turnoutIndex_,
+                              saved_state ? "NORMAL" : "REVERSED");
             }
 
             return REINIT_NEEDED;
