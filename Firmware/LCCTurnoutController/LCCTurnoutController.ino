@@ -51,28 +51,61 @@ PCAPwm              *servoPwmWrappers[NUM_TURNOUTS];
 MCPGpio             *gpioWrappers[NUM_TURNOUTS];
 openlcb::ServoTurnout *servoTurnouts[NUM_TURNOUTS];
 
-// ── Debug: config space write logger ────────────────────────────────
-// Wraps the real config FileMemorySpace to log every CDI write that
-// arrives over LCC.  Lets us see whether JMRI is writing config at all
-// and whether UPDATE_COMPLETE (which triggers apply_configuration) follows.
-class LoggingConfigSpace : public MemorySpace {
+// ── Live config update proxy ──────────────────────────────────────────
+// Wraps the real FileMemorySpace registered by OpenMRN for SPACE_CONFIG.
+// On every write it logs the access and schedules a debounced call to
+// ConfigUpdateService::trigger_update() (500 ms after the last write),
+// so apply_configuration() fires on all ServoTurnout objects immediately
+// without waiting for an UPDATE_COMPLETE datagram that JMRI may omit.
+class LiveConfigSpace : public openlcb::MemorySpace {
 public:
-    LoggingConfigSpace(MemorySpace *delegate) : delegate_(delegate) {}
-    bool read_only() override { return delegate_->read_only(); }
+    LiveConfigSpace(openlcb::MemorySpace *delegate,
+                    openlcb::SimpleStackBase *stack)
+        : delegate_(delegate), stack_(stack) {}
+
+    bool      read_only()  override { return delegate_->read_only(); }
     address_t max_address() override { return delegate_->max_address(); }
+
     size_t read(address_t src, uint8_t *dst, size_t len,
-               errorcode_t *err, Notifiable *again) override {
+                errorcode_t *err, Notifiable *again) override {
         return delegate_->read(src, dst, len, err, again);
     }
+
     size_t write(address_t dest, const uint8_t *data, size_t len,
                  errorcode_t *err, Notifiable *again) override {
-        Serial.printf("DEBUG ConfigSpace WRITE: offset=%u len=%u\n",
+        Serial.printf("Config write: offset=%u len=%u\n",
                       (unsigned)dest, (unsigned)len);
-        return delegate_->write(dest, data, len, err, again);
+        size_t result = delegate_->write(dest, data, len, err, again);
+        // Reset the debounce timer so we trigger once after all writes settle.
+        updateTicker_.once_ms(500, &LiveConfigSpace::on_writes_settled, this);
+        return result;
     }
+
 private:
-    MemorySpace *delegate_;
+    static void on_writes_settled(LiveConfigSpace *self) {
+        Serial.println("Config writes settled — applying configuration");
+        self->stack_->config_service()->trigger_update();
+    }
+
+    openlcb::MemorySpace     *delegate_;
+    openlcb::SimpleStackBase *stack_;
+    Ticker                    updateTicker_;
 };
+
+// ── Live config: replace the default SPACE_CONFIG with our proxy ────
+static void install_live_config_space() {
+    auto *reg  = openmrn.stack()->memory_config_handler()->registry();
+    auto *node = openmrn.stack()->node();
+    auto *orig = reg->lookup(node, openlcb::MemoryConfigDefs::SPACE_CONFIG);
+    if (!orig) {
+        Serial.println("WARNING: SPACE_CONFIG not found — live config updates disabled");
+        return;
+    }
+    auto *proxy = new LiveConfigSpace(orig, openmrn.stack());
+    reg->erase(node, openlcb::MemoryConfigDefs::SPACE_CONFIG, orig);
+    reg->insert(node, openlcb::MemoryConfigDefs::SPACE_CONFIG, proxy);
+    Serial.println("Live config updates enabled");
+}
 
 // ── MCP23017 frog-relay init ────────────────────────────────────────
 static void setup_frog_gpio() {
@@ -173,23 +206,10 @@ void setup() {
     openmrn.add_can_port(&can0);
     openmrn.begin();
 
-    // ── Install config-write logger ─────────────────────────────────
-    // After begin(), the stack has registered a FileMemorySpace for
-    // SPACE_CONFIG. Swap it with our logging wrapper so we can see
-    // every CDI write that arrives from JMRI.
-    {
-        auto *reg = openmrn.stack()->memory_config_handler()->registry();
-        auto *node = openmrn.stack()->node();
-        auto *origSpace = reg->lookup(node, openlcb::MemoryConfigDefs::SPACE_CONFIG);
-        if (origSpace) {
-            auto *logged = new LoggingConfigSpace(origSpace);
-            reg->erase(node, openlcb::MemoryConfigDefs::SPACE_CONFIG, origSpace);
-            reg->insert(node, openlcb::MemoryConfigDefs::SPACE_CONFIG, logged);
-            Serial.println("Config space write logging installed");
-        } else {
-            Serial.println("WARNING: could not find SPACE_CONFIG to wrap");
-        }
-    }
+    // ── Install live config update proxy ────────────────────────────
+    // Must run after openmrn.begin() so the stack has registered its
+    // default FileMemorySpace for SPACE_CONFIG.
+    install_live_config_space();
 
     openmrn.start_executor_thread();
 
